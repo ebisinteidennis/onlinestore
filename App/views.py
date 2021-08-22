@@ -3,6 +3,11 @@ from .models import Post
 from django.views import generic
 from .models import Post
 from .forms import CommentForm
+from django.core.files.storage import FileSystemStorage
+from .forms import SignUpForm
+from django.core.mail import send_mail, BadHeaderError
+from django.http import HttpResponse, HttpResponseRedirect 
+from .forms import ContactForm
 
 # Create your views here.
 
@@ -40,6 +45,38 @@ class PostDetail(generic.DetailView):
 def currency(request):
       template = 'currency.html'
       return render(request, template)
+
+def upload(request):
+    if request.method == 'POST' and request.FILES['upload']:
+        upload = request.FILES['upload']
+        fss = FileSystemStorage()
+        file = fss.save(upload.name, upload)
+        file_url = fss.url(file)
+        return render(request, 'upload.html', {'file_url': file_url})
+    return render(request, 'upload.html')
+
+def signup(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            user.refresh_from_db()  
+            # load the profile instance created by the signal
+            user.save()
+            raw_password = form.cleaned_data.get('password1')
+ 
+            # login user after signing up
+            user = authenticate(username=user.username, password=raw_password)
+            login(request, user)
+ 
+            # redirect user to home page
+            return redirect('home')
+    else:
+        form = SignUpForm()
+    return render(request, 'signup.html', {'form': form})
+
+def contact(request):
+    return render(request, 'contact.html')
 
 # def base(request):
 #       template1 = 'base.html'

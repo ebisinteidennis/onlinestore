@@ -46,7 +46,5 @@ class Image(models.Model):
         from django.urls import reverse
         return reverse("post_detail", kwargs={"slug": str(self.slug)})
 
-class Hotel(models.Model):
-	name = models.CharField(max_length=50)
-	hotel_Main_Img = models.ImageField(upload_to='images/')
-  
+class upload(models.Model):
+    ...
