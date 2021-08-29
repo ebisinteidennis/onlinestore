@@ -1,4 +1,0 @@
-# name of your environment
-venv
-# do not allow python cache file
-*.pyc
